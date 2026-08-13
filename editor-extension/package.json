@@ -1,0 +1,67 @@
+{
+  "name": "perflens-optimizer",
+  "displayName": "PerfLens Optimizer",
+  "description": "消费 PerfLens 结构化报告，在 VS Code/Cursor 中生成、审阅和应用前端性能优化补丁。",
+  "version": "0.1.0",
+  "publisher": "local",
+  "engines": { "vscode": "^1.90.0" },
+  "categories": ["Other", "Linters"],
+  "activationEvents": [
+    "onView:perflens.findings",
+    "onCommand:perflens.importReport",
+    "onCommand:perflens.optimize",
+    "onCommand:perflens.setApiKey"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      { "command": "perflens.importReport", "title": "PerfLens: 导入结构化报告" },
+      { "command": "perflens.optimize", "title": "PerfLens: 对话并生成优化补丁" },
+      { "command": "perflens.setApiKey", "title": "PerfLens: 设置当前模型 API Key" },
+      { "command": "perflens.showReport", "title": "PerfLens: 查看当前优化计划" },
+      { "command": "perflens.exportSession", "title": "PerfLens: 导出修复会话" }
+    ],
+    "viewsContainers": {
+      "activitybar": [{ "id": "perflens", "title": "PerfLens", "icon": "media/icon.svg" }]
+    },
+    "views": {
+      "perflens": [{ "id": "perflens.findings", "name": "优化路径" }]
+    },
+    "menus": {
+      "view/title": [
+        { "command": "perflens.importReport", "when": "view == perflens.findings", "group": "navigation" },
+        { "command": "perflens.optimize", "when": "view == perflens.findings", "group": "navigation" }
+      ]
+    },
+    "configuration": {
+      "title": "PerfLens Optimizer",
+      "properties": {
+        "perflens.provider": {
+          "type": "string",
+          "enum": ["openai-responses", "deepseek", "anthropic", "openai-chat"],
+          "default": "openai-responses",
+          "description": "模型接口规范"
+        },
+        "perflens.apiBase": {
+          "type": "string",
+          "default": "",
+          "description": "模型 Base URL；留空时使用所选提供方预设"
+        },
+        "perflens.model": {
+          "type": "string",
+          "default": "",
+          "description": "模型名称；留空时使用所选提供方预设"
+        },
+        "perflens.maxContextFiles": {
+          "type": "number",
+          "default": 12,
+          "minimum": 1,
+          "maximum": 30,
+          "description": "单次优化最多发送的工程文件数"
+        }
+      }
+    }
+  },
+  "scripts": { "test": "node test/run.js", "check": "node --check extension.js && node --check src/model-client.js && node --check src/report.js && node --check src/repair.js" },
+  "license": "MIT"
+}

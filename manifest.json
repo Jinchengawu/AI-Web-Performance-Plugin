@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "前端性能诊断台",
+  "version": "0.3.0",
+  "description": "采集当前页面的核心性能指标，并使用大模型生成优化报告。",
+  "permissions": ["activeTab", "storage", "scripting"],
+  "host_permissions": ["http://*/*", "https://*/*"],
+  "action": {
+    "default_title": "分析当前页面",
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["probes/runtime.js", "probes/snapshot.js", "probes/audits.js", "content.js"],
+      "run_at": "document_start",
+      "all_frames": false
+    }
+  ]
+}

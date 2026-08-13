@@ -1,0 +1,19 @@
+{
+  "name": "perflens",
+  "version": "0.3.0",
+  "private": true,
+  "description": "End-to-end web performance, SEO diagnosis, structured remediation, and editor-assisted optimization.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jinchengawu/AI-Web-Performance-Plugin.git"
+  },
+  "scripts": {
+    "check": "node --check background.js && node --check content.js && node --check popup.js && node --check probes/runtime.js && node --check probes/snapshot.js && node --check probes/audits.js && node --check shared/report-protocol.js && node --check shared/evidence-intake.js && node --check shared/comparison.js",
+    "test": "npm run check && node test/model_adapters_test.js && node test/protocol_test.js && node editor-extension/test/run.js",
+    "test:browser": "node test/run-browser-test.js"
+  },
+  "devDependencies": {
+    "playwright": "1.58.2"
+  }
+}

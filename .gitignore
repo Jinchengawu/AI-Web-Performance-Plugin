@@ -1,0 +1,16 @@
+.DS_Store
+node_modules/
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.vsix
+perflens-*.json
+perflens-*.md
+coverage/
+dist/
+!editor-extension/dist/
+editor-extension/dist/*
+!editor-extension/dist/.gitkeep

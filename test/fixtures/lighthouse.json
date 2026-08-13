@@ -1,0 +1,14 @@
+{
+  "lighthouseVersion": "12.0.0",
+  "fetchTime": "2026-08-14T00:00:00.000Z",
+  "categories": {
+    "performance": { "score": 0.42 },
+    "seo": { "score": 0.73 }
+  },
+  "audits": {
+    "first-contentful-paint": { "score": 0.5, "numericValue": 2400, "displayValue": "2.4 s" },
+    "largest-contentful-paint": { "score": 0.2, "numericValue": 5100, "displayValue": "5.1 s" },
+    "total-blocking-time": { "score": 0.4, "numericValue": 800, "displayValue": "800 ms" },
+    "cumulative-layout-shift": { "score": 0.9, "numericValue": 0.05, "displayValue": "0.05" }
+  }
+}

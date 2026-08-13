@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>前端性能诊断台</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">PAGE TRACE / LIVE</p>
+          <h1>性能诊断台</h1>
+        </div>
+        <button id="settingsToggle" class="icon-button" aria-label="打开设置" title="设置">⚙</button>
+      </header>
+
+      <section id="settings" class="settings" hidden>
+        <label>接口规范
+          <select id="provider">
+            <option value="openai-responses">OpenAI Responses</option>
+            <option value="deepseek">DeepSeek Chat Completions</option>
+            <option value="anthropic">Anthropic Messages / Claude</option>
+            <option value="openai-chat">OpenAI-compatible Chat Completions</option>
+          </select>
+        </label>
+        <p id="providerHint" class="provider-hint"></p>
+        <label>API Base URL<input id="apiBase" type="url" placeholder="https://api.openai.com/v1" /></label>
+        <label>模型<input id="model" type="text" placeholder="gpt-5.6-luna" /></label>
+        <label><span id="apiKeyLabel">API Key</span><input id="apiKey" type="password" placeholder="填写当前提供方的 Key" autocomplete="off" /></label>
+        <div class="settings-actions">
+          <span>密钥仅保存在本机</span>
+          <button id="saveSettings" class="small-button">保存设置</button>
+        </div>
+      </section>
+
+      <section class="target">
+        <span class="pulse" aria-hidden="true"></span>
+        <div class="target-copy">
+          <strong id="pageTitle">等待采集当前页面</strong>
+          <span id="pageUrl">打开一个 http(s) 页面后开始分析</span>
+        </div>
+      </section>
+
+      <section class="score-panel" aria-label="性能评分">
+        <div class="score-ring" id="scoreRing">
+          <strong id="score">—</strong>
+          <span>/ 100</span>
+        </div>
+        <div>
+          <p class="score-label">页面会话快照评分</p>
+          <h2 id="verdict">尚未分析</h2>
+          <p id="scoreHint">采集导航、渲染、交互与资源数据。</p>
+        </div>
+      </section>
+
+      <section class="trace" aria-label="核心性能指标">
+        <div class="trace-axis"><span>0</span><span>2.5s</span><span>4s+</span></div>
+        <div id="metricGrid" class="metric-grid">
+          <article class="metric placeholder"><span>LCP</span><strong>—</strong><small>最大内容绘制</small></article>
+          <article class="metric placeholder"><span>INP</span><strong>—</strong><small>交互响应</small></article>
+          <article class="metric placeholder"><span>CLS</span><strong>—</strong><small>布局偏移</small></article>
+          <article class="metric placeholder"><span>TTFB</span><strong>—</strong><small>服务端响应</small></article>
+        </div>
+      </section>
+
+      <section id="details" class="details" hidden></section>
+      <section id="comparison" class="comparison" hidden></section>
+
+      <section class="evidence-panel">
+        <div class="section-heading compact-heading">
+          <div><p class="eyebrow">EXTERNAL EVIDENCE</p><h2>补充检测材料</h2></div>
+          <label class="upload-button">导入报告<input id="evidenceFiles" type="file" accept=".json,.html,.htm,.txt,.md,.csv,application/json,text/*" multiple /></label>
+        </div>
+        <p class="section-note">支持 Lighthouse / PageSpeed JSON，以及 HTML、Markdown、CSV、文本报告；单文件最大 2MB。</p>
+        <div id="evidenceList" class="evidence-list"><span>尚未导入外部材料</span></div>
+      </section>
+
+      <div id="status" class="status" role="status" aria-live="polite"></div>
+      <div class="primary-actions">
+        <button id="analyze" class="primary-button">采集性能快照</button>
+        <button id="diagnose" class="ai-button" disabled><span>✦</span> 大模型诊断</button>
+      </div>
+
+      <section id="reportSection" class="report" hidden>
+        <div class="section-heading">
+          <div><p class="eyebrow">AI REVIEW</p><h2>诊断报告</h2></div>
+          <div class="report-actions"><button id="exportJson" class="small-button">结构化 JSON</button><button id="exportMarkdown" class="small-button">Markdown</button><button id="exportRaw" class="small-button">原始参数</button><button id="copyReport" class="small-button">复制</button></div>
+        </div>
+        <div id="reportContent" class="report-content"></div>
+      </section>
+    </main>
+    <script src="shared/report-protocol.js"></script>
+    <script src="shared/evidence-intake.js"></script>
+    <script src="shared/comparison.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>

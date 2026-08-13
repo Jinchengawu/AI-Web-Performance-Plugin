@@ -1,0 +1,5 @@
+.git/**
+test/**
+*.vsix
+dist/**
+README.md
