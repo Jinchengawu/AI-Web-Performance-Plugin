@@ -1,6 +1,6 @@
 {
   "name": "perflens",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "description": "End-to-end web performance, SEO diagnosis, structured remediation, and editor-assisted optimization.",
   "license": "MIT",
@@ -9,8 +9,8 @@
     "url": "git+https://github.com/Jinchengawu/AI-Web-Performance-Plugin.git"
   },
   "scripts": {
-    "check": "node --check background.js && node --check content.js && node --check popup.js && node --check probes/runtime.js && node --check probes/snapshot.js && node --check probes/audits.js && node --check shared/report-protocol.js && node --check shared/evidence-intake.js && node --check shared/comparison.js",
-    "test": "npm run check && node test/model_adapters_test.js && node test/protocol_test.js && node editor-extension/test/run.js && python3 -m unittest discover -s plugins/perflens/test -p 'test_*.py'",
+    "check": "node --check background.js && node --check content.js && node --check popup.js && node --check probes/runtime.js && node --check probes/snapshot.js && node --check probes/audits.js && node --check shared/report-protocol.js && node --check shared/evidence-intake.js && node --check shared/comparison.js && node --check shared/history-store.js",
+    "test": "npm run check && node test/model_adapters_test.js && node test/protocol_test.js && node test/memory_test.js && node test/history_test.js && node editor-extension/test/run.js && python3 -m unittest discover -s plugins/perflens/test -p 'test_*.py'",
     "test:browser": "node test/run-browser-test.js"
   },
   "devDependencies": {

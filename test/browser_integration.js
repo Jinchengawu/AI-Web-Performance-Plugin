@@ -44,7 +44,22 @@ const chrome = process.env.PERFLENS_CHROME_PATH || chromium.executablePath();
     await popup.waitForFunction(() => document.querySelector("#score").textContent !== "—");
     if (!(await popup.locator("#details").isVisible())) throw new Error("Details did not render");
     const details = await popup.locator("#details").innerText();
-    if (!details.includes("规则发现") || !details.includes("SEO")) throw new Error(`Audit summary missing: ${details}`);
+    if (!details.includes("综合规则覆盖") || !details.includes("SEO")) throw new Error(`Audit summary missing: ${details}`);
+    if (!(await popup.locator("#memoryPanel").isVisible())) throw new Error("Memory runtime panel did not render");
+    if (!(await popup.locator("#environmentPanel").isVisible())) throw new Error("Environment panel did not render");
+    const environment = await popup.locator("#environmentPanel").innerText();
+    if (!environment.includes("浏览器") || !environment.includes("操作系统") || !environment.includes("网络")) throw new Error(`Environment evidence missing: ${environment}`);
+    const persisted = await popup.evaluate(async () => {
+      const value = await chrome.storage.local.get("perflensHistoryV1");
+      const records = Object.values(value.perflensHistoryV1?.pages || {}).flatMap((item) => item.records || []);
+      return { count: records.length, rules: records[0]?.package?.evidence?.coverage?.rules || 0, hasEnvironment: Boolean(records[0]?.package?.evidence?.snapshot?.environment), hasMemory: Boolean(records[0]?.package?.evidence?.snapshot?.runtime?.memory) };
+    });
+    if (persisted.count !== 1 || persisted.rules < 40 || !persisted.hasEnvironment || !persisted.hasMemory) throw new Error(`Persisted run incomplete: ${JSON.stringify(persisted)}`);
+    await popup.reload();
+    await popup.waitForFunction(() => document.querySelectorAll(".history-row").length === 1);
+    await page.bringToFront();
+    await popup.evaluate(() => document.querySelector("#analyze").click());
+    await popup.waitForFunction(() => document.querySelectorAll(".history-row").length === 2);
     if (!(await popup.locator("#reportSection").isVisible())) throw new Error("Deterministic report did not render");
     if (await popup.locator("#reportContent table").count() !== 1) throw new Error("Markdown metrics table did not render");
 
@@ -78,7 +93,7 @@ const chrome = process.env.PERFLENS_CHROME_PATH || chromium.executablePath();
     });
     await page.bringToFront();
     await popup.evaluate(() => document.querySelector("#analyze").click());
-    await popup.waitForFunction(() => document.querySelector("#status").textContent.includes("快照已完成"));
+    await popup.waitForFunction(() => document.querySelector("#status").textContent.includes("快照已保存"));
     const comparison = await popup.locator("#comparison").innerText();
     if (!comparison.includes("已解决") || comparison.includes("已解决 0")) throw new Error(`Verification delta failed: ${comparison}`);
 

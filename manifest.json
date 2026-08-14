@@ -1,9 +1,10 @@
 {
   "manifest_version": 3,
   "name": "前端性能诊断台",
-  "version": "0.3.0",
-  "description": "采集当前页面的核心性能指标，并使用大模型生成优化报告。",
+  "version": "0.4.0",
+  "description": "持久化页面评测历史，采集真实运行环境与内存趋势，并生成综合 Web 质量诊断。",
   "permissions": ["activeTab", "storage", "scripting"],
+  "optional_permissions": ["processes"],
   "host_permissions": ["http://*/*", "https://*/*"],
   "action": {
     "default_title": "分析当前页面",

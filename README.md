@@ -22,9 +22,11 @@ Chrome 基线采集
 - Core Web Vitals：LCP、INP 高分位交互、CLS session window
 - 导航阶段：Redirect、DNS、TCP、TLS、Request/TTFB、Download、FCP、DOMContentLoaded、Load
 - 主线程：Long Task、总阻塞时间估算、Long Animation Frame 与脚本归因
+- 内存运行时：5 秒 JS Heap 趋势采样、页面整体内存估算、可选 Chrome 渲染进程私有内存、增长斜率与泄漏风险分级
+- 评测环境：浏览器完整版本、操作系统与架构、CPU/设备内存、视口与 DPR、网络类型/带宽/RTT/省流量状态、协议与跨源隔离状态
 - LCP 元素：标签、ID、Class、资源 URL、元素面积
 - 资源瀑布：类型、数量、传输/解码体积、压缩比、缓存命中、协议、最慢/最大资源
-- 第三方来源、JS Heap、DOM 数量与最大深度、图片/脚本/样式表统计
+- 第三方来源、DOM 数量与最大深度、图片/脚本/样式表统计
 
 ### SEO、可访问性与工程质量
 
@@ -33,7 +35,15 @@ Chrome 基线采集
 - JSON-LD 存在性、类型与语法有效性
 - 图片 alt、表单控件可访问名称、按钮可访问名称
 - 图片尺寸声明、同步阻塞脚本、DOM 规模等
-- 当前内置 19 条确定性 Audit Rule，输出证据、严重度和建议
+- 当前内置 43 条确定性 Audit Rule，覆盖性能、内存、SEO、可访问性、安全与工程质量，并输出执行/通过/失败/不可测覆盖率
+
+### 持久化测试历史
+
+- 每次采集自动按“页面 Origin + Path”保存到 `chrome.storage.local`，查询参数和 Hash 不落盘
+- 每页保留最近 20 次、全局最多 120 次，并在接近 7MB 时自动淘汰最旧记录
+- 弹窗关闭、浏览器重启后仍可查看；单击历史记录即可设为复测基线
+- 大模型诊断自动携带当前页面最近 5 次指标摘要，用于识别退化与趋势
+- 历史记录支持逐条删除或按页面清空
 
 ## 外部材料与报告
 
@@ -43,6 +53,7 @@ Chrome 基线采集
 - 单文件限制 2MB，最多 8 份；发送给模型的外部证据总量限制 160K 字符
 - 导出 Portable Audit Package JSON、Markdown 报告、原始 Performance Snapshot
 - 导入基线报告后自动计算复测差异、已解决/新增/仍存在规则
+- 历史或外部基线可对比 LCP、INP、CLS、TTFB、FCP、阻塞时间、内存、传输体积和 DOM 规模
 
 ## 结构化诊断
 

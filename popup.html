@@ -43,6 +43,14 @@
         </div>
       </section>
 
+      <section class="history-panel" aria-label="当前页面测试历史">
+        <div class="section-heading compact-heading">
+          <div><p class="eyebrow">RUN LEDGER / LOCAL</p><h2>当前页面历史</h2></div>
+          <button id="clearHistory" class="small-button" hidden>清空</button>
+        </div>
+        <div id="historyList" class="history-list"><span class="empty-note">还没有持久化记录，完成首次采集后会自动保存。</span></div>
+      </section>
+
       <section class="score-panel" aria-label="性能评分">
         <div class="score-ring" id="scoreRing">
           <strong id="score">—</strong>
@@ -66,6 +74,17 @@
       </section>
 
       <section id="details" class="details" hidden></section>
+      <section id="memoryPanel" class="memory-panel" hidden>
+        <div class="memory-head">
+          <div><p class="eyebrow">MEMORY TRACE</p><h2>内存运行时</h2></div>
+          <button id="memoryPermission" class="small-button">启用进程内存</button>
+        </div>
+        <div id="memoryContent"></div>
+      </section>
+      <section id="environmentPanel" class="environment-panel" hidden>
+        <div class="section-heading compact-heading"><div><p class="eyebrow">TEST CONTEXT</p><h2>本次评测环境</h2></div></div>
+        <div id="environmentContent" class="environment-grid"></div>
+      </section>
       <section id="comparison" class="comparison" hidden></section>
 
       <section class="evidence-panel">
@@ -94,6 +113,8 @@
     <script src="shared/report-protocol.js"></script>
     <script src="shared/evidence-intake.js"></script>
     <script src="shared/comparison.js"></script>
+    <script src="shared/history-store.js"></script>
+    <script src="probes/audits.js"></script>
     <script src="popup.js"></script>
   </body>
 </html>

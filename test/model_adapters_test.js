@@ -38,13 +38,20 @@ async function run(provider) {
   const result = await new Promise((resolve) => listener({
     type: "AI_DIAGNOSE",
     evidence: {
-      snapshot: { page: { url: "https://example.com/?secret=1", title: "Test", measuredAt: "2026-08-14T00:00:00Z" } },
-      audits: [], attachments: [],
+      snapshot: {
+        page: { url: "https://example.com/?secret=1", title: "Test", measuredAt: "2026-08-14T00:00:00Z" },
+        environment: { network: { effectiveType: "4g", rttMs: 80 }, operatingSystem: { platform: "macOS" } },
+        runtime: { memory: { risk: { level: "watch", sampleCount: 8 } } },
+      },
+      audits: [], coverage: { rules: 43, evaluated: 41 }, history: [{ reportId: "history-marker", score: 70 }], attachments: [],
     },
   }, null, resolve));
   assert.equal(result.ok, true);
   assert.equal(result.plan.summary, "诊断完成");
   assert.equal(JSON.stringify(request).includes("secret=1"), false);
+  assert(JSON.stringify(request).includes("history-marker"));
+  assert(JSON.stringify(request).includes("effectiveType"));
+  assert(JSON.stringify(request).includes("sampleCount"));
   return request;
 }
 

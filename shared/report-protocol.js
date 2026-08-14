@@ -1,5 +1,5 @@
 (function initReportProtocol(global) {
-  const SCHEMA_VERSION = "1.0.0";
+  const SCHEMA_VERSION = "1.1.0";
   const severityRank = { critical: 0, high: 1, medium: 2, low: 3, info: 4 };
 
   function id(prefix = "report") {
@@ -67,12 +67,12 @@
     return safe;
   }
 
-  function createPackage({ snapshot, audits, attachments = [], plan = null, provider = null, comparison = null }) {
+  function createPackage({ snapshot, audits, attachments = [], plan = null, provider = null, comparison = null, coverage = null, history = [], reportId = null }) {
     if (!snapshot?.page?.measuredAt) throw new Error("缺少有效的 Performance Snapshot。");
     return {
       schema: "perflens.audit-package",
       schemaVersion: SCHEMA_VERSION,
-      reportId: id(),
+      reportId: reportId || id(),
       generatedAt: new Date().toISOString(),
       source: {
         product: "PerfLens Chrome",
@@ -82,6 +82,8 @@
       evidence: {
         snapshot: sanitizeSnapshot(snapshot),
         audits,
+        coverage,
+        history: history.slice(0, 5),
         attachments: attachments.map(({ content, structured, ...metadata }) => ({ ...metadata, content })),
       },
       optimizationPlan: plan,
@@ -113,8 +115,18 @@
       `| INP | ${snapshot.timing.inp ?? "未采集"} ms |`,
       `| CLS | ${snapshot.timing.cls ?? "未采集"} |`,
       `| TTFB | ${snapshot.timing.ttfb ?? "未采集"} ms |`,
+      `| FCP | ${snapshot.timing.fcp ?? "未采集"} ms |`,
       `| 总阻塞时间 | ${snapshot.runtime.totalBlockingTime} ms |`,
       `| DOM 节点 | ${snapshot.document.domNodes} |`,
+      `| 页面/进程内存 | ${formatBytes(snapshot.runtime.processMemory?.privateMemory || snapshot.runtime.memory?.pageMemory?.bytes || snapshot.runtime.memory?.usedJSHeapSize)} |`,
+      "",
+      "## 评测环境",
+      "",
+      `- 浏览器：${browserLabel(snapshot.environment?.browser)}`,
+      `- 操作系统：${environmentLabel(snapshot.environment?.operatingSystem)}`,
+      `- 设备：${snapshot.environment?.device?.hardwareConcurrency ?? "未知"} 逻辑核心 · ${snapshot.environment?.device?.deviceMemoryGB ?? "未知"}GB 设备内存`,
+      `- 网络：${networkLabel(snapshot.environment?.network)} · ${snapshot.timing.protocol || "协议未知"}`,
+      `- 内存风险：${snapshot.runtime.memory?.risk?.level || "未评估"} · ${snapshot.runtime.memory?.risk?.reason || "无趋势证据"}`,
       "",
     ];
     if (!plan) {
@@ -141,10 +153,36 @@
     return lines.join("\n");
   }
 
+  function formatBytes(value) {
+    if (!Number.isFinite(value)) return "未采集";
+    return value >= 1073741824 ? `${(value / 1073741824).toFixed(2)} GB` : `${(value / 1048576).toFixed(1)} MB`;
+  }
+
+  function browserLabel(browser) {
+    const brands = browser?.uaData?.fullVersionList || browser?.uaData?.brands;
+    if (Array.isArray(brands) && brands.length) return brands.map((item) => `${item.brand} ${item.version}`).join(" / ");
+    return browser?.userAgent || "未知";
+  }
+
+  function environmentLabel(os) {
+    if (!os) return "未知";
+    return [os.platform, os.platformVersion, os.architecture, os.bitness ? `${os.bitness}-bit` : null].filter(Boolean).join(" ") || "未知";
+  }
+
+  function networkLabel(network) {
+    if (!network) return "未知";
+    return [network.online === false ? "离线" : "在线", network.effectiveType, Number.isFinite(network.downlinkMbps) ? `${network.downlinkMbps}Mbps` : null, Number.isFinite(network.rttMs) ? `RTT ${network.rttMs}ms` : null, network.saveData ? "省流量" : null].filter(Boolean).join(" · ");
+  }
+
   function appendComparison(lines, comparison) {
       lines.push("", "## 复测差异", "", `- 基线报告：\`${comparison.baselineReportId}\``);
       for (const metric of comparison.metrics) {
-        if (metric.delta !== null) lines.push(`- ${metric.label}：${metric.before} → ${metric.after}（${metric.delta > 0 ? "+" : ""}${metric.delta}${metric.unit}）${metric.improved ? " ✅" : ""}`);
+        if (metric.delta !== null) {
+          const before = metric.unit === "bytes" ? formatBytes(metric.before) : `${metric.before}${metric.unit}`;
+          const after = metric.unit === "bytes" ? formatBytes(metric.after) : `${metric.after}${metric.unit}`;
+          const delta = metric.unit === "bytes" ? `${metric.delta > 0 ? "+" : "-"}${formatBytes(Math.abs(metric.delta))}` : `${metric.delta > 0 ? "+" : ""}${metric.delta}${metric.unit}`;
+          lines.push(`- ${metric.label}：${before} → ${after}（${delta}）${metric.improved ? " ✅" : ""}`);
+        }
       }
       lines.push(`- 已解决规则：${comparison.resolvedAuditIds.length}；新增规则：${comparison.newAuditIds.length}；仍存在：${comparison.remainingAuditIds.length}`);
   }
