@@ -1,13 +1,13 @@
 # PerfLens 前端性能诊断与优化闭环
 
-PerfLens 是一个“两端一协议”的前端质量产品：Chrome 扩展负责真实页面采集、规则审计和结构化诊断；VS Code/Cursor 扩展消费同一份 Portable Audit Package，在目标工程中生成、审阅并应用最小优化补丁。
+PerfLens 是一个“三端一协议”的前端质量产品：Chrome 扩展负责真实页面采集、规则审计和结构化诊断；VS Code/Cursor 扩展与 Codex Plugin 消费同一份 Portable Audit Package，在目标工程中生成、审阅并应用最小优化补丁。
 
 ```text
 Chrome 基线采集
   → 确定性审计 + 外部证据
   → 大模型 Optimization Plan
   → Portable Audit Package (.json)
-  → VS Code/Cursor 导入
+  → VS Code/Cursor 或 Codex Plugin 导入
   → 自然语言 + 工程上下文
   → 用户审阅并应用源码补丁
   → Fix Session (.json)
@@ -89,6 +89,27 @@ Markdown 只是展示 Adapter；`perflens.audit-package` JSON 才是浏览器与
 - 用户多选后还需模态二次确认
 - 建议命令只显示，不自动执行
 
+## 安装 Codex Plugin
+
+Codex 端位于 [`plugins/perflens/`](plugins/perflens/)，可读取 Chrome 导出的 `perflens.audit-package`，把发现映射到当前工程、实施最小修复、执行项目检查，并导出可重新导入 Chrome 的 Fix Session。
+
+从 GitHub 安装：
+
+```bash
+codex plugin marketplace add Jinchengawu/AI-Web-Performance-Plugin
+codex plugin add perflens@perflens
+```
+
+本地开发时可把第一条命令的仓库地址替换为当前仓库的绝对路径。
+
+安装或更新后请新建 Codex 任务，再使用 `$perflens-optimize`，例如：
+
+```text
+使用 $perflens-optimize 导入 /path/to/perflens-audit.json，修复 P0/P1 问题并生成 Fix Session。
+```
+
+Codex Plugin 不需要额外模型 API Key；它使用当前 Codex 会话完成代码分析和修改。Chrome 仍负责真实性能采集与 DeepSeek、Anthropic、OpenAI 等外部模型诊断。Codex 本地测试通过不代表 Web Vitals 已改善，最终结果必须刷新目标页并重新采集。
+
 ## 隐私与生产部署
 
 - 每个模型提供方独立保存配置，避免跨厂商误发密钥
@@ -117,6 +138,7 @@ shared/                 Evidence Intake、报告协议、基线比较
 background.js           结构化诊断与模型 Provider Adapter
 popup.*                 Chrome UI Adapter
 editor-extension/       VS Code/Cursor 修复 Adapter
+plugins/perflens/       Codex 审计到代码修复 Plugin
 docs/adr/               架构决策
 test/                   浏览器集成 fixture 与自动化
 ```

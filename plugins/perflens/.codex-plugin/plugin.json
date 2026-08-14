@@ -1,0 +1,29 @@
+{
+  "name": "perflens",
+  "version": "0.1.0",
+  "description": "Turn PerfLens browser audits into reviewed, verified source-code fixes in Codex.",
+  "author": {
+    "name": "Jinchengawu",
+    "url": "https://github.com/Jinchengawu"
+  },
+  "homepage": "https://github.com/Jinchengawu/AI-Web-Performance-Plugin#安装-codex-plugin",
+  "repository": "https://github.com/Jinchengawu/AI-Web-Performance-Plugin",
+  "license": "MIT",
+  "keywords": ["performance", "web-vitals", "seo", "chrome", "audit"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "PerfLens",
+    "shortDescription": "Convert browser audits into verified code fixes.",
+    "longDescription": "Import a PerfLens Portable Audit Package, connect findings to the current web project, implement minimal reviewed fixes, run acceptance checks, and export a Fix Session for Chrome retesting.",
+    "developerName": "Jinchengawu",
+    "category": "Developer Tools",
+    "capabilities": ["Read", "Write", "Verification"],
+    "websiteURL": "https://github.com/Jinchengawu/AI-Web-Performance-Plugin",
+    "defaultPrompt": [
+      "Import this PerfLens audit and explain the highest-impact fixes.",
+      "Implement the safe P0 and P1 fixes from my PerfLens report.",
+      "Verify these fixes and export a PerfLens Fix Session."
+    ],
+    "brandColor": "#12A594"
+  }
+}

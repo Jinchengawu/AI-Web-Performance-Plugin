@@ -1,0 +1,20 @@
+{
+  "name": "perflens",
+  "interface": {
+    "displayName": "Perflens"
+  },
+  "plugins": [
+    {
+      "name": "perflens",
+      "source": {
+        "source": "local",
+        "path": "./plugins/perflens"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}

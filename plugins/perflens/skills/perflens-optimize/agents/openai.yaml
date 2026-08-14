@@ -1,0 +1,4 @@
+interface:
+  display_name: "PerfLens Optimize"
+  short_description: "Turn web audits into verified code fixes"
+  default_prompt: "Use $perflens-optimize to import this PerfLens audit and implement the highest-impact verified fixes."
